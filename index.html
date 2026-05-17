@@ -216,16 +216,38 @@
       let clipEnd = 0;
       let isFirstVideoLoad = true;
 
+      // Direct HD streaming mapping from Vimeo so it works seamlessly in production (Vercel) without committing gigabytes of videos
+      const VIDEO_PROD_MAP = {
+        "Aula 1 - Fernando Machado/Fernando_Machado_Aula1_Parte1.mp4": "https://player.vimeo.com/external/362147486.hd.mp4?s=29a59ba5707ccaa76c55127cde339e4dd5970876&profile_id=174&oauth2_token_id=1238381684",
+        "Aula 1 - Fernando Machado/Fernando_Machado_Aula1_Parte2.mp4": "https://player.vimeo.com/external/362150834.hd.mp4?s=4a453ef45499424e02135fc9ddbde8031304917e&profile_id=174&oauth2_token_id=1238381684",
+        "Aula 1 - Fernando Machado/Fernando_Machado_Aula1_Parte3.mp4": "https://player.vimeo.com/external/362155330.hd.mp4?s=354012f43c0531f073a2b957764d0ddaaa0060a2&profile_id=174&oauth2_token_id=1238381684",
+        "Aula 1 - Fernando Machado/Fernando_Machado_Aula1_Parte4.mp4": "https://player.vimeo.com/external/362158294.hd.mp4?s=befe9618926cef30ea9e36656b97a1b5efd81d77&profile_id=174&oauth2_token_id=1238381684",
+        "Aula 2 - Fernando Machado/Fernando_Machado_Aula2_Parte1.mp4": "https://player.vimeo.com/external/362160126.hd.mp4?s=a6815bfe72470465fe61d73bf6412807bcd33303&profile_id=174&oauth2_token_id=1238381684",
+        "Aula 2 - Fernando Machado/Fernando_Machado_Aula2_Parte2.mp4": "https://player.vimeo.com/external/362162820.hd.mp4?s=bef1287b698d8eb5ca959a76733b3656087aaec7&profile_id=174&oauth2_token_id=1238381684",
+        "Aula 2 - Fernando Machado/Fernando_Machado_Aula2_Parte3.mp4": "https://player.vimeo.com/external/362145050.hd.mp4?s=22dc3bf10732353bb97272e22bf8f6e8b2b12972&profile_id=174&oauth2_token_id=1238381684",
+        "Aula 2 - Fernando Machado/Fernando_Machado_Aula2_Parte4.mp4": "https://player.vimeo.com/external/362282632.hd.mp4?s=1c175c985b4d82df193c13844372fcf091b81a62&profile_id=174&oauth2_token_id=1238381684"
+      };
+
       function loadVideoSegment(item) {
         clipStart = item.video.start;
         clipEnd = item.video.end;
         
-        // Relative source video mapping
-        const absoluteVideoPath = `../Videos Branded Content/${item.video.src}`;
+        let videoSrc = "";
+        // Detect if running locally (localhost, 127.0.0.1 or file://)
+        const isLocal = window.location.hostname === "localhost" || 
+                        window.location.hostname === "127.0.0.1" || 
+                        window.location.protocol === "file:";
+
+        if (isLocal) {
+          videoSrc = `../Videos Branded Content/${item.video.src}`;
+        } else {
+          // If on Vercel, stream directly from Vimeo high-speed CDN in HTTPS
+          videoSrc = VIDEO_PROD_MAP[item.video.src] || `../Videos Branded Content/${item.video.src}`;
+        }
         
         // Clean and load new source to prevent buffering issues
-        if (videoElement.getAttribute("src") !== absoluteVideoPath) {
-          videoElement.src = absoluteVideoPath;
+        if (videoElement.getAttribute("src") !== videoSrc) {
+          videoElement.src = videoSrc;
           videoElement.load();
         }
 
