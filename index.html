@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Burger King Marketing Masterclass — Fernando Machado</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Dynamic Theme Background Glow -->
+  <div class="bg-glow" id="bg-glow"></div>
+
+  <div class="app-container">
+    
+
+    <!-- Main Presentation Window -->
+    <main class="presentation-window">
+      
+      <div class="presentation-content">
+        
+        <!-- Left Panel: Slide Case Details -->
+        <section class="case-card-container" id="case-card-container">
+          <!-- Populated Dynamically by JavaScript -->
+        </section>
+
+        <!-- Right Panel: Video Clip Player -->
+        <section class="video-card-container">
+          <div class="video-card">
+            
+            <div class="video-wrapper" id="video-wrapper">
+              <video id="bk-video" preload="auto" playsinline>
+                <!-- Source loaded dynamically -->
+                Seu navegador não suporta a reprodução local de vídeos HTML5.
+              </video>
+              
+              <!-- Aesthetic Video Hover Overlay Play Button -->
+              <div class="video-overlay" id="video-overlay">
+                <button class="overlay-play-btn" id="overlay-play-btn" aria-label="Play Clip">
+                  <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
+                    <path d="M8 5v14l11-7z"/>
+                  </svg>
+                </button>
+              </div>
+              <!-- Custom Premium Controls Panel -->
+              <div class="custom-player-controls">
+                
+                <!-- Row 1: Timeline Slider -->
+                <div class="controls-row-top">
+                  <div class="timeline-container" id="timeline-container" title="Arrastar ou Clicar para Navegar no Clipe">
+                    <div class="timeline-progress" id="timeline-progress"></div>
+                  </div>
+                  <div class="time-counter" id="time-counter">00:00 / 00:00</div>
+                </div>
+
+                <!-- Row 2: Operation Buttons -->
+                <div class="controls-row-bottom">
+                  <div class="left-buttons">
+                    <button class="control-btn" id="play-btn" title="Reproduzir / Pausar clipe">
+                      <svg viewBox="0 0 24 24" id="play-icon" width="16" height="16" fill="currentColor">
+                        <path d="M8 5v14l11-7z"/>
+                      </svg>
+                      <svg viewBox="0 0 24 24" id="pause-icon" width="16" height="16" fill="currentColor" style="display:none;">
+                        <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+                      </svg>
+                      <span id="play-text">Play</span>
+                    </button>
+
+                    <button class="control-btn" id="replay-btn" title="Reiniciar clipe do início">
+                      <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                        <path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/>
+                      </svg>
+                      Replay
+                    </button>
+
+                    <button class="control-btn" id="loop-btn" title="Ativar loop contínuo do clipe">
+                      <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                        <path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/>
+                      </svg>
+                      Loop
+                    </button>
+                  </div>
+
+                  <div class="right-buttons">
+                    <span class="clip-badge">
+                      <span class="clip-badge-dot"></span>
+                      Clip Ativo
+                    </span>
+
+                    <select id="speed-control" class="control-btn" title="Velocidade de Reprodução">
+                      <option value="1">1x</option>
+                      <option value="1.5">1.5x</option>
+                      <option value="2">2x</option>
+                    </select>
+
+                    <button class="control-btn" id="fullscreen-btn" title="Tela Cheia">
+                      <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                        <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+      </div>
+
+
+
+    </main>
+
+  </div>
+
+  <!-- Anime.js Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+  
+  <!-- Loading Cases JS and Presentation Logic Script -->
+  <script src="cases.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // Elements Mapping
+      const navList = document.getElementById("nav-list");
+      const caseCardContainer = document.getElementById("case-card-container");
+      const videoElement = document.getElementById("bk-video");
+      const videoCard = document.querySelector(".video-card");
+      const videoOverlay = document.getElementById("video-overlay");
+      const overlayPlayBtn = document.getElementById("overlay-play-btn");
+      const bgGlow = document.getElementById("bg-glow");
+      
+      // Control Elements
+      const playBtn = document.getElementById("play-btn");
+      const playIcon = document.getElementById("play-icon");
+      const pauseIcon = document.getElementById("pause-icon");
+      const playText = document.getElementById("play-text");
+      const replayBtn = document.getElementById("replay-btn");
+      const loopBtn = document.getElementById("loop-btn");
+      const fullscreenBtn = document.getElementById("fullscreen-btn");
+      const speedControl = document.getElementById("speed-control");
+      const timelineContainer = document.getElementById("timeline-container");
+      const timelineProgress = document.getElementById("timeline-progress");
+      const timeCounter = document.getElementById("time-counter");
+      
+      // Deck Elements removed
+
+      // Presentation State
+      let currentSlideIndex = 0;
+      let loopActive = true; // Auto-loop standard clip range
+      const cases = BK_CASES_DATA.cases;
+      
+      // Load initial state
+      function initNavigation() {
+        // Loop Default State Style
+        if (loopActive) loopBtn.classList.add("active");
+      }
+
+      // Render Active Slide
+      function renderSlide(index) {
+        const item = cases[index];
+        currentSlideIndex = index;
+        
+        // CSS Custom variables adjustment for themes
+        document.documentElement.style.setProperty('--accent-color', item.accent);
+        bgGlow.style.background = item.theme;
+
+        // Populate Left Panel Slide HTML
+        caseCardContainer.innerHTML = `
+          <div class="case-slide">
+            <header class="slide-header stagger-item" style="--stagger-idx: 1;">
+              <div class="slide-title-wrapper">
+                <h2 class="slide-title">${item.campaign}</h2>
+              </div>
+              <span class="slide-year-badge">${item.year}</span>
+            </header>
+            
+            <div class="slide-body">
+              <div class="detail-block stagger-item" style="--stagger-idx: 2;">
+                <span class="detail-label">🎯 O Desafio</span>
+                <p class="detail-text">${item.problem}</p>
+              </div>
+
+              <div class="detail-block stagger-item" style="--stagger-idx: 3;">
+                <span class="detail-label">💡 A Ideia / Insight</span>
+                <p class="detail-text">${item.insight}</p>
+              </div>
+
+              <div class="detail-block stagger-item" style="--stagger-idx: 4;">
+                <span class="detail-label">⚡ A Execução</span>
+                <p class="detail-text">${item.execution}</p>
+              </div>
+
+              <div class="detail-block stagger-item" style="--stagger-idx: 5;">
+                <span class="detail-label">📊 Resultados</span>
+                <p class="detail-text">${item.result}</p>
+              </div>
+
+              <div class="takeaway-box stagger-item" style="--stagger-idx: 6;">
+                <div class="detail-block">
+                  <span class="detail-label">🧠 Por Que é Brilhante?</span>
+                  <p class="detail-text">${item.why_brilliant}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+
+        // Load specific video clip segment
+        loadVideoSegment(item);
+      }
+
+      // Handle Video Timing Controls
+      let clipStart = 0;
+      let clipEnd = 0;
+      let isFirstVideoLoad = true;
+
+      function loadVideoSegment(item) {
+        clipStart = item.video.start;
+        clipEnd = item.video.end;
+        
+        // Relative source video mapping
+        const absoluteVideoPath = `../Videos Branded Content/${item.video.src}`;
+        
+        // Clean and load new source to prevent buffering issues
+        if (videoElement.getAttribute("src") !== absoluteVideoPath) {
+          videoElement.src = absoluteVideoPath;
+          videoElement.load();
+        }
+
+        // Seek directly to range start
+        videoElement.currentTime = clipStart;
+        videoElement.playbackRate = parseFloat(speedControl.value);
+        updateTimeDisplay(clipStart);
+        timelineProgress.style.width = "0%";
+        
+        // Pause active elements on slide change to avoid noise
+        pauseVideo();
+      }
+
+      // Playback State Operatives
+      function playVideo() {
+        videoElement.play()
+          .then(() => {
+            playIcon.style.display = "none";
+            pauseIcon.style.display = "block";
+            playText.textContent = "Pausar";
+            videoOverlay.style.opacity = 0;
+            videoOverlay.style.pointerEvents = "none";
+          })
+          .catch(err => {
+            console.log("Autoplay bloqueado. Aguardando interação do usuário.", err);
+          });
+      }
+
+      function pauseVideo() {
+        videoElement.pause();
+        playIcon.style.display = "block";
+        pauseIcon.style.display = "none";
+        playText.textContent = "Play";
+        videoOverlay.style.opacity = 1;
+        videoOverlay.style.pointerEvents = "auto";
+      }
+
+      function togglePlay() {
+        if (videoElement.paused) {
+          playVideo();
+        } else {
+          pauseVideo();
+        }
+      }
+
+      function updateTimeDisplay(current) {
+        const relativeCurrent = Math.max(0, current - clipStart);
+        const relativeTotal = Math.max(0, clipEnd - clipStart);
+        
+        const formatTime = (seconds) => {
+          const min = Math.floor(seconds / 60);
+          const sec = Math.floor(seconds % 60);
+          return `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+        };
+
+        timeCounter.textContent = `${formatTime(relativeCurrent)} / ${formatTime(relativeTotal)}`;
+      }
+
+      // Video Event Listeners
+      videoElement.addEventListener("timeupdate", () => {
+        const current = videoElement.currentTime;
+        
+        // Boundaries verification
+        if (current < clipStart) {
+          videoElement.currentTime = clipStart;
+          return;
+        }
+
+        if (current >= clipEnd) {
+          if (loopActive) {
+            videoElement.currentTime = clipStart;
+            playVideo();
+          } else {
+            pauseVideo();
+            videoElement.currentTime = clipStart;
+          }
+          return;
+        }
+
+        // Timeline progress rendering relative to clip start and end values
+        const percentage = ((current - clipStart) / (clipEnd - clipStart)) * 100;
+        timelineProgress.style.width = `${Math.min(100, Math.max(0, percentage))}%`;
+        updateTimeDisplay(current);
+      });
+
+      // Avoid double action on simple clicks inside canvas frame
+      videoElement.addEventListener("click", togglePlay);
+
+      // Custom Operations Bindings
+      playBtn.addEventListener("click", togglePlay);
+      overlayPlayBtn.addEventListener("click", playVideo);
+      
+      replayBtn.addEventListener("click", () => {
+        videoElement.currentTime = clipStart;
+        playVideo();
+      });
+
+      loopBtn.addEventListener("click", () => {
+        loopActive = !loopActive;
+        loopBtn.classList.toggle("active", loopActive);
+      });
+
+      speedControl.addEventListener("change", (e) => {
+        videoElement.playbackRate = parseFloat(e.target.value);
+      });
+
+      const videoWrapper = document.getElementById("video-wrapper");
+
+      fullscreenBtn.addEventListener("click", () => {
+        if (!document.fullscreenElement) {
+          if (videoWrapper.requestFullscreen) {
+            videoWrapper.requestFullscreen();
+          } else if (videoWrapper.webkitRequestFullscreen) { /* Safari */
+            videoWrapper.webkitRequestFullscreen();
+          } else if (videoWrapper.msRequestFullscreen) { /* IE11 */
+            videoWrapper.msRequestFullscreen();
+          }
+        } else {
+          if (document.exitFullscreen) {
+            document.exitFullscreen();
+          }
+        }
+      });
+
+      // Interactive Timeline seeking
+      timelineContainer.addEventListener("click", (e) => {
+        const rect = timelineContainer.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const width = rect.width;
+        const percentage = clickX / width;
+        
+        const targetTime = clipStart + percentage * (clipEnd - clipStart);
+        videoElement.currentTime = targetTime;
+        
+        // Progress immediately matches seek position
+        timelineProgress.style.width = `${percentage * 100}%`;
+        updateTimeDisplay(targetTime);
+      });
+
+      // Slide Deck controls
+      function selectSlide(index) {
+        if (index < 0 || index >= cases.length) return;
+        
+        const direction = index > currentSlideIndex ? 'slide-forward' : 'slide-backward';
+        document.documentElement.classList.remove('slide-forward', 'slide-backward');
+        document.documentElement.classList.add(direction);
+        
+        // Use View Transitions API for Morph effect if supported
+        if (!document.startViewTransition) {
+          renderSlide(index);
+          playAnimejsStagger();
+        } else {
+          const transition = document.startViewTransition(() => {
+            renderSlide(index);
+          });
+          transition.ready.then(() => {
+            playAnimejsStagger();
+          });
+        }
+      }
+
+      function playAnimejsStagger() {
+        if (typeof anime !== 'undefined') {
+          anime({
+            targets: '.stagger-item',
+            translateY: [30, 0],
+            scale: [0.95, 1],
+            opacity: [0, 1],
+            delay: anime.stagger(100, {start: 400}), // Wait 400ms for push slide transition, then stagger 100ms
+            easing: 'easeOutElastic(1, .8)',
+            duration: 1000
+          });
+        }
+      }
+
+      // Keyboard arrow control binds
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowRight") {
+          selectSlide(currentSlideIndex + 1);
+        } else if (e.key === "ArrowLeft") {
+          selectSlide(currentSlideIndex - 1);
+        } else if (e.key === " ") {
+          // Prevent spacebar standard window scrolling
+          e.preventDefault();
+          togglePlay();
+        }
+      });
+
+      // Initialization routine
+      initNavigation();
+      renderSlide(0);
+      setTimeout(playAnimejsStagger, 100);
+    });
+  </script>
+</body>
+</html>
